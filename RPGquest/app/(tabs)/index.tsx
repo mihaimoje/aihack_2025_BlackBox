@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   const [message, setMessage] = useState('');
@@ -11,23 +12,29 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content} />
-      <View style={styles.inputBar}>
-        <TextInput
-          style={styles.input}
-          value={message}
-          onChangeText={setMessage}
-          placeholder="Type your message..."
-          placeholderTextColor="#aaa"
-        />
-        <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-          <Text style={styles.sendButtonText}>Send</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.tabBar}>
-      </View>
-    </SafeAreaView>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={0}
+    >
+      <SafeAreaView style={styles.container}>
+        <View style={styles.content} />
+        <View style={styles.tabBar}>
+        </View>
+        <View style={styles.inputBar}>
+          <TextInput
+            style={styles.input}
+            value={message}
+            onChangeText={setMessage}
+            placeholder="Type your message..."
+            placeholderTextColor="#aaa"
+          />
+          <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
+            <Text style={styles.sendButtonArrow}>↑</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -58,14 +65,18 @@ const styles = StyleSheet.create({
   },
   sendButton: {
     backgroundColor: '#228B22',
-    borderRadius: 20,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    borderRadius: 16,
+    width: 32,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 4,
   },
-  sendButtonText: {
+  sendButtonArrow: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: 'bold',
+    marginTop: -2,
   },
   tabBar: {
     height: 60,
