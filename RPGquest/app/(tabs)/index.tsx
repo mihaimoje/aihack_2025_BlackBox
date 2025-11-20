@@ -1,13 +1,24 @@
+
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+type Message = {
+  text: string;
+  type: 'sent' | 'reply';
+};
 
 export default function HomeScreen() {
   const [message, setMessage] = useState('');
+  const [messages, setMessages] = useState<Message[]>([]);
 
   const handleSend = () => {
-    // You can handle the send action here (e.g., send message to backend or display it)
-    console.log('Message sent:', message);
+    if (!message.trim()) return;
+    setMessages(prev => [
+      ...prev,
+      { text: message, type: 'sent' },
+      { text: `this is your quest: ${message}`, type: 'reply' }
+    ]);
     setMessage('');
   };
 
@@ -18,7 +29,18 @@ export default function HomeScreen() {
       keyboardVerticalOffset={0}
     >
       <SafeAreaView style={styles.container}>
-        <View style={styles.content} />
+        <View style={styles.content}>
+          <ScrollView style={styles.messagesContainer} contentContainerStyle={styles.messagesContent} showsVerticalScrollIndicator={false}>
+            {messages.map((msg, idx) => (
+              <View
+                key={idx}
+                style={msg.type === 'sent' ? styles.sentMessage : styles.replyMessage}
+              >
+                <Text style={styles.messageText}>{msg.text}</Text>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
         <View style={styles.tabBar}>
         </View>
         <View style={styles.inputBar}>
@@ -45,6 +67,38 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    paddingHorizontal: 8,
+    paddingTop: 8,
+    paddingBottom: 0,
+  },
+  messagesContainer: {
+    flex: 1,
+    width: '100%',
+  },
+  messagesContent: {
+    paddingBottom: 8,
+  },
+  sentMessage: {
+    alignSelf: 'flex-end',
+    backgroundColor: '#228B22',
+    borderRadius: 16,
+    marginVertical: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    maxWidth: '80%',
+  },
+  replyMessage: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#32503fff',
+    borderRadius: 16,
+    marginVertical: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    maxWidth: '80%',
+  },
+  messageText: {
+    color: '#f0f3f2ff',
+    fontSize: 16,
   },
   inputBar: {
     flexDirection: 'row',
