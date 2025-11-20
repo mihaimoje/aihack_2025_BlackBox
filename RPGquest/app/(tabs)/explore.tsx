@@ -4,11 +4,11 @@ import { RadarChart } from '@salmonco/react-native-radar-chart';
 
 export default function ExploreStatsScreen() {
   const data = [
-    { label: 'Strength', value: 0 },
-    { label: 'Intelligence', value: 0 },
-    { label: 'Health', value: 0 },
-    { label: 'Charisma', value: 0 },
-    { label: 'Creativity', value: 0 },
+    { label: 'Strength', value: 6 },
+    { label: 'Intelligence', value: 8 },
+    { label: 'Health', value: 5 },
+    { label: 'Charisma', value: 7 },
+    { label: 'Creativity', value: 18 },
   ];
 
   const size = 385;       // chart size
@@ -37,33 +37,33 @@ export default function ExploreStatsScreen() {
       <View style={[styles.chartWrapper, { width: size, height: size }]}>
         <RadarChart
           data={data}
-          maxValue={10}
+          maxValue={25}
           size={size}
           scale={1}
 
-          // only draw the web lines, no solid pie fill
+          // ono solid pie fill
           fillColor="#013220"
-          fillOpacity={0} // ⬅️ make background of chart transparent over your dark green
+          fillOpacity={0} 
 
-          // concentric rings (web circles)
+          // 
           stroke={['#1c5a37', '#1c5a37', '#1c5a37', '#1c5a37', '#1c5a37']}
-          strokeWidth={[1.5, 1.5, 1.5, 1.5, 1.8]}  // ⬅️ thicker web lines
+          strokeWidth={[1.5, 1.5, 1.5, 1.5, 1.8]}
           strokeOpacity={[1, 1, 1, 1, 1]}
 
-          // labels – we hide them because you have icons
+     
           labelColor="transparent"
           labelSize={0}
           labelFontFamily="System"
           labelDistance={1.1}
 
-          // data polygon (currently collapsed to center because value=0)
+         
           dataFillColor="#00FFAA"
-          dataFillOpacity={0}        // ⬅️ no filled polygon for now
+          dataFillOpacity={0.25}    
           dataStroke="#00FFAA"
           dataStrokeWidth={2}
           dataStrokeOpacity={1}
 
-          // radial division lines between stats
+        
           divisionStroke="#1c5a37"
           divisionStrokeWidth={1.5}
           divisionStrokeOpacity={1}
@@ -71,7 +71,7 @@ export default function ExploreStatsScreen() {
           isCircle
         />
 
-        {/* Icons around the chart */}
+        {/* iconsaround the chart */}
         {data.map((item, index) => {
           const angle = (index / data.length) * (Math.PI * 2) - Math.PI / 2;
           const radius = size / 2 - radiusOffset;
@@ -105,7 +105,7 @@ export default function ExploreStatsScreen() {
         })}
       </View>
 
-      {/* Icons row below chart */}
+      {/*row below chart */}
       <View style={styles.iconsRow}>
         {data.map(item => (
           <View key={item.label} style={styles.iconBlock}>
@@ -114,8 +114,8 @@ export default function ExploreStatsScreen() {
               style={{
                 width: iconSize,
                 height: iconSize,
-                resizeMode: 'contain', 
-                tintColor: '#fff',
+                resizeMode: 'contain',
+                tintColor: '#fff',  // cause they were black originally 
               }}
             />
             <Text style={styles.iconLabel}>{item.label}</Text>
