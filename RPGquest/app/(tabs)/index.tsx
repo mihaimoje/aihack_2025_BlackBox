@@ -1,6 +1,14 @@
-
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Message = {
@@ -8,18 +16,59 @@ type Message = {
   type: 'sent' | 'reply';
 };
 
+
+const BACKEND_URL = 'http://localhost:3001/generate-quest';
+
 export default function HomeScreen() {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleSend = () => {
-    if (!message.trim()) return;
-    setMessages(prev => [
-      ...prev,
-      { text: message, type: 'sent' },
-      { text: `this is your quest: ${message}`, type: 'reply' }
-    ]);
+  const handleSend = async () => {
+    if (!message.trim() || loading) return;
+
+    const userText = message.trim();
+
+    // 1) Add your message to the chat
+    setMessages(prev => [...prev, { text: userText, type: 'sent' }]);
     setMessage('');
+
+    try {
+      setLoading(true);
+
+      // 2) Call your backend
+      const res = await fetch(BACKEND_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userText }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        const errMsg = data?.detail || data?.error || 'Failed to generate quest.';
+        throw new Error(errMsg);
+      }
+
+      const questText: string =
+        data.questText ||
+        'No quest received. The quest scroll is mysteriously blank.';
+
+      // 3) Add backend reply to the chat
+      setMessages(prev => [...prev, { text: questText, type: 'reply' }]);
+    } catch (err: any) {
+      setMessages(prev => [
+        ...prev,
+        {
+          text:
+            'Error while generating quest: ' +
+            (err?.message || 'Something went wrong.'),
+          type: 'reply',
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -30,7 +79,11 @@ export default function HomeScreen() {
     >
       <SafeAreaView style={styles.container}>
         <View style={styles.content}>
-          <ScrollView style={styles.messagesContainer} contentContainerStyle={styles.messagesContent} showsVerticalScrollIndicator={false}>
+          <ScrollView
+            style={styles.messagesContainer}
+            contentContainerStyle={styles.messagesContent}
+            showsVerticalScrollIndicator={false}
+          >
             {messages.map((msg, idx) => (
               <View
                 key={idx}
@@ -41,18 +94,23 @@ export default function HomeScreen() {
             ))}
           </ScrollView>
         </View>
-        <View style={styles.tabBar}>
-        </View>
+
+        <View style={styles.tabBar} />
+
         <View style={styles.inputBar}>
           <TextInput
             style={styles.input}
             value={message}
             onChangeText={setMessage}
-            placeholder="Type your message..."
+            placeholder="Tell me your vibe... e.g. go to the gym and do chest day"
             placeholderTextColor="#aaa"
           />
-          <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-            <Text style={styles.sendButtonArrow}>↑</Text>
+          <TouchableOpacity
+            style={[styles.sendButton, loading && { opacity: 0.5 }]}
+            onPress={handleSend}
+            disabled={loading}
+          >
+            <Text style={styles.sendButtonArrow}>{loading ? '…' : '↑'}</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
