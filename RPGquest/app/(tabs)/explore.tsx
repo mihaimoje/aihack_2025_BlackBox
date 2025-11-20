@@ -114,7 +114,7 @@ export default function ExploreStatsScreen() {
               style={{
                 width: iconSize,
                 height: iconSize,
-                resizeMode: 'contain',
+                resizeMode: 'contain', 
                 tintColor: '#fff',
               }}
             />
